@@ -1,440 +1,390 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0,
+                 viewport-fit=cover">
 
-<title>Air Purifier | Augmented Reality</title>
+  <title>Air Purifier | Augmented Reality</title>
 
-<!-- A-Frame -->
-<script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <!-- A-Frame -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
-<!-- AR.js -->
-<script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script>
+  <!-- AR.js: Hiro marker tracking -->
+  <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script>
 
-<style>
-* {
-  box-sizing: border-box;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: black;
-  font-family: Arial, sans-serif;
-}
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: Arial, sans-serif;
+    }
 
-/* Interface only.
-   Do NOT override AR.js video or canvas. */
+    #controls {
+      position: fixed;
+      top: 12px;
+      left: 10px;
+      right: 10px;
+      z-index: 1000;
+      padding: 12px;
+      background: rgba(12, 27, 45, 0.88);
+      color: white;
+      text-align: center;
+      border-radius: 10px;
+    }
 
-#interface {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 9999;
-  padding: 10px;
-  padding-top: max(10px, env(safe-area-inset-top));
-  pointer-events: none;
-}
+    h3 {
+      margin: 0 0 5px;
+      font-size: 15px;
+    }
 
-#header {
-  width: 100%;
-  max-width: 460px;
-  margin: 0 auto;
-  padding: 10px 12px;
-  background: rgba(10, 27, 50, 0.88);
-  color: white;
-  text-align: center;
-  border-radius: 10px;
-}
+    #subtitle {
+      margin: 0 0 10px;
+      font-size: 11px;
+      color: #d2dfeb;
+    }
 
-#header h2 {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.4;
-}
+    button {
+      padding: 10px 14px;
+      margin: 3px;
+      border: 1px solid #60758a;
+      border-radius: 7px;
+      background: #173c67;
+      color: white;
+      font-size: 13px;
+      cursor: pointer;
+    }
 
-#header p {
-  margin: 3px 0 0;
-  font-size: 11px;
-  color: #d3e4f5;
-}
+    button.active {
+      background: #087c55;
+    }
 
-#buttons {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 10px;
-  pointer-events: auto;
-}
-
-button {
-  border: 1px solid rgba(255,255,255,0.5);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 13px;
-  color: white;
-  background: #183a63;
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
-button.active {
-  background: #087a56;
-}
-
-button:disabled {
-  opacity: 0.6;
-}
-
-#status {
-  position: fixed;
-  bottom: max(12px, env(safe-area-inset-bottom));
-  left: 10px;
-  right: 10px;
-  max-width: 460px;
-  margin: 0 auto;
-  padding: 12px;
-  z-index: 10000;
-  background: rgba(0, 0, 0, 0.82);
-  color: white;
-  border-radius: 10px;
-  text-align: center;
-  font-size: 12px;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
-  pointer-events: none;
-}
-
-#status.success {
-  background: rgba(0, 95, 62, 0.90);
-}
-
-#status.error {
-  background: rgba(155, 25, 25, 0.92);
-}
-</style>
+    #status {
+      position: fixed;
+      bottom: 15px;
+      left: 10px;
+      right: 10px;
+      z-index: 1000;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      text-align: center;
+      border-radius: 8px;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- User interface -->
-<div id="interface">
+  <div id="controls">
+    <h3>Mechanical Engineering | Air Purifier</h3>
+    <p id="subtitle">
+      SolidWorks 2024 | Marker-Based AR
+    </p>
 
-  <div id="header">
-    <h2>Mechanical Engineering | Air Purifier</h2>
-    <p>SolidWorks 2024 • Augmented Reality</p>
-  </div>
-
-  <div id="buttons">
     <button id="cubeBtn" class="active">
       Test Cube
     </button>
 
     <button id="modelBtn">
-      CAD Model
+      View Air Purifier
     </button>
   </div>
 
-</div>
+  <div id="status">
+    Starting AR camera...
+  </div>
 
-<div id="status">
-  Initializing AR. Please allow camera access.
-</div>
+  <!-- No preloaded GLB assets -->
+  <a-scene
+    embedded
+    vr-mode-ui="enabled: false"
+    arjs="sourceType: webcam;
+          debugUIEnabled: false;"
+    renderer="antialias: true;">
 
-<!-- AR SCENE -->
-<a-scene
-  embedded
-  vr-mode-ui="enabled: false"
-  arjs="sourceType: webcam; debugUIEnabled: false;"
-  renderer="antialias: true; colorManagement: true;">
-
-  <!-- Ambient light -->
-  <a-entity
-    light="type: ambient; intensity: 1.3; color: #ffffff">
-  </a-entity>
-
-  <!-- Directional light -->
-  <a-entity
-    light="type: directional; intensity: 1.2"
-    position="2 4 3">
-  </a-entity>
-
-  <!-- HIRO MARKER -->
-  <a-marker
-    id="hiroMarker"
-    preset="hiro"
-    emitevents="true">
-
-    <!-- WORKING TEST CUBE -->
-    <a-box
-      id="testCube"
-      position="0 0.25 0"
-      width="0.5"
-      height="0.5"
-      depth="0.5"
-      color="#ff3030">
-    </a-box>
-
-    <!-- CAD model parent -->
+    <!-- Lighting -->
     <a-entity
-      id="modelContainer"
-      visible="false">
-
-      <!-- Model will be loaded after button press -->
-      <a-entity
-        id="cadModel">
-      </a-entity>
-
+      light="type: ambient;
+             color: #ffffff;
+             intensity: 1.4">
     </a-entity>
 
-  </a-marker>
+    <a-entity
+      light="type: directional;
+             color: #ffffff;
+             intensity: 1.1"
+      position="2 4 3">
+    </a-entity>
 
-  <!-- AR CAMERA -->
-  <a-entity camera></a-entity>
+    <!-- Hiro Marker -->
+    <a-marker
+      id="hiroMarker"
+      preset="hiro"
+      emitevents="true">
 
-</a-scene>
+      <!-- Diagnostic cube -->
+      <a-box
+        id="testCube"
+        position="0 0.25 0"
+        width="0.5"
+        height="0.5"
+        depth="0.5"
+        color="#ff3333">
+      </a-box>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+      <!-- Air Purifier model container -->
+      <a-entity
+        id="modelContainer"
+        visible="false">
 
-  const cubeBtn = document.getElementById("cubeBtn");
-  const modelBtn = document.getElementById("modelBtn");
+        <a-entity
+          id="airPurifier"
+          position="0 0 0"
+          rotation="0 0 0"
+          scale="1 1 1">
+        </a-entity>
 
-  const status = document.getElementById("status");
+      </a-entity>
 
-  const marker = document.getElementById("hiroMarker");
-  const cube = document.getElementById("testCube");
+    </a-marker>
 
-  const container = document.getElementById("modelContainer");
-  const model = document.getElementById("cadModel");
+    <!-- Camera -->
+    <a-entity camera></a-entity>
 
-  const scene = document.querySelector("a-scene");
+  </a-scene>
 
-  let currentMode = "cube";
-  let markerVisible = false;
-  let modelLoaded = false;
-  let modelLoading = false;
-  let modelFailed = false;
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
 
-  function showStatus(message, type = "") {
-    status.textContent = message;
-    status.className = type;
-  }
+      const status =
+        document.getElementById("status");
 
-  function updateStatus() {
+      const marker =
+        document.getElementById("hiroMarker");
 
-    if (currentMode === "cube") {
+      const cube =
+        document.getElementById("testCube");
 
-      if (markerVisible) {
-        showStatus(
-          "HIRO marker detected. Red cube visible.",
-          "success"
-        );
-      } else {
-        showStatus(
-          "Point your camera at the HIRO marker."
-        );
+      const container =
+        document.getElementById("modelContainer");
+
+      const model =
+        document.getElementById("airPurifier");
+
+      const cubeBtn =
+        document.getElementById("cubeBtn");
+
+      const modelBtn =
+        document.getElementById("modelBtn");
+
+      let mode = "cube";
+      let markerVisible = false;
+      let modelLoaded = false;
+      let modelLoading = false;
+      let modelError = "";
+
+      function message(text) {
+        status.textContent = text;
       }
 
-      return;
-    }
+      function updateStatus() {
 
-    if (modelFailed) {
-      showStatus(
-        "CAD loading failed. Check assembly.glb and browser console.",
-        "error"
-      );
-      return;
-    }
+        if (mode === "cube") {
+          message(
+            markerVisible
+              ? "HIRO detected. Red cube should be visible."
+              : "Point camera at the HIRO marker."
+          );
+          return;
+        }
 
-    if (modelLoading) {
-      showStatus(
-        "Loading SolidWorks assembly. Please wait..."
-      );
-      return;
-    }
+        if (modelError) {
+          message("Model error: " + modelError);
+          return;
+        }
 
-    if (modelLoaded && markerVisible) {
-      showStatus(
-        "Air Purifier loaded. HIRO marker detected.",
-        "success"
-      );
-    } else if (modelLoaded) {
-      showStatus(
-        "CAD model ready. Point camera at HIRO marker."
-      );
-    } else {
-      showStatus(
-        "Press CAD Model to load the assembly."
-      );
-    }
-  }
+        if (modelLoading) {
+          message("Loading air purifier assembly...");
+          return;
+        }
 
-  function displayMode(mode) {
+        if (modelLoaded) {
+          message(
+            markerVisible
+              ? "Air purifier loaded. Marker detected."
+              : "Model ready. Scan the HIRO marker."
+          );
+          return;
+        }
 
-    currentMode = mode;
+        message("Preparing CAD model...");
+      }
 
-    cube.setAttribute(
-      "visible",
-      mode === "cube"
-    );
+      function setMode(nextMode) {
 
-    container.setAttribute(
-      "visible",
-      mode === "model"
-    );
+        mode = nextMode;
 
-    cubeBtn.classList.toggle(
-      "active",
-      mode === "cube"
-    );
-
-    modelBtn.classList.toggle(
-      "active",
-      mode === "model"
-    );
-
-    updateStatus();
-  }
-
-  // Start in the proven red-cube test mode.
-  displayMode("cube");
-
-  cubeBtn.addEventListener("click", function () {
-    displayMode("cube");
-  });
-
-  modelBtn.addEventListener("click", function () {
-
-    displayMode("model");
-
-    if (!modelLoaded &&
-        !modelLoading &&
-        !modelFailed) {
-
-      modelLoading = true;
-      updateStatus();
-
-      // Load only when explicitly requested.
-      model.setAttribute(
-        "gltf-model",
-        "url(./assembly.glb)"
-      );
-    }
-  });
-
-  // Marker events
-  marker.addEventListener("markerFound", function () {
-    markerVisible = true;
-    updateStatus();
-  });
-
-  marker.addEventListener("markerLost", function () {
-    markerVisible = false;
-    updateStatus();
-  });
-
-  // Model successfully loaded
-  model.addEventListener("model-loaded", function () {
-
-    modelLoading = false;
-    modelLoaded = true;
-    modelFailed = false;
-
-    console.log("assembly.glb loaded successfully");
-
-    // Fit static SolidWorks model to a tabletop marker.
-    // This changes presentation scale only.
-    try {
-
-      const mesh = model.getObject3D("mesh");
-
-      if (mesh) {
-
-        mesh.updateMatrixWorld(true);
-
-        const bounds = new THREE.Box3().setFromObject(mesh);
-
-        const size = new THREE.Vector3();
-        const center = new THREE.Vector3();
-
-        bounds.getSize(size);
-        bounds.getCenter(center);
-
-        const maxDimension = Math.max(
-          size.x,
-          size.y,
-          size.z
+        cube.setAttribute(
+          "visible",
+          mode === "cube"
         );
+
+        container.setAttribute(
+          "visible",
+          mode === "model"
+        );
+
+        cubeBtn.classList.toggle(
+          "active",
+          mode === "cube"
+        );
+
+        modelBtn.classList.toggle(
+          "active",
+          mode === "model"
+        );
+
+        updateStatus();
+      }
+
+      // Marker tracking events
+      marker.addEventListener(
+        "markerFound",
+        () => {
+          markerVisible = true;
+          updateStatus();
+        }
+      );
+
+      marker.addEventListener(
+        "markerLost",
+        () => {
+          markerVisible = false;
+          updateStatus();
+        }
+      );
+
+      // Test cube
+      cubeBtn.addEventListener("click", () => {
+        setMode("cube");
+      });
+
+      // Air purifier
+      modelBtn.addEventListener("click", () => {
+
+        setMode("model");
 
         if (
-          maxDimension > 0 &&
-          Number.isFinite(maxDimension)
+          !modelLoaded &&
+          !modelLoading &&
+          !modelError
         ) {
 
-          const factor = 0.85 / maxDimension;
+          modelLoading = true;
+          updateStatus();
 
-          // Uniformly scale the static assembly.
-          // Initial GLB scene transform is preserved.
-          mesh.scale.multiplyScalar(factor);
-
-          // Center over marker and lift base
-          // to marker height.
-          mesh.position.x -= center.x * factor;
-          mesh.position.y -= bounds.min.y * factor;
-          mesh.position.z -= center.z * factor;
-
-          console.log("Model fit factor:", factor);
+          // Load the GLB only on demand
+          model.setAttribute(
+            "gltf-model",
+            "url(./assembly.glb)"
+          );
         }
-      }
+      });
 
-    } catch (error) {
-      console.warn(
-        "Automatic model fitting unavailable:",
-        error
-      );
-    }
+      // Model loaded successfully
+      model.addEventListener("model-loaded", () => {
 
-    updateStatus();
-  });
+        modelLoaded = true;
+        modelLoading = false;
 
-  // Model loading failed
-  model.addEventListener("model-error", function (event) {
+        try {
 
-    modelLoading = false;
-    modelFailed = true;
+          const mesh = model.getObject3D("mesh");
 
-    console.error(
-      "GLB loading error:",
-      event.detail
-    );
+          if (mesh) {
 
-    updateStatus();
-  });
+            mesh.updateMatrixWorld(true);
 
-  // Scene initialized
-  scene.addEventListener("loaded", function () {
-    console.log("A-Frame scene initialized");
-    updateStatus();
-  });
+            const bounds =
+              new THREE.Box3().setFromObject(mesh);
 
-  // Browser diagnostics
-  window.addEventListener("error", function (event) {
-    console.error(
-      "Browser error:",
-      event.message
-    );
-  });
+            const size = new THREE.Vector3();
+            const center = new THREE.Vector3();
 
-});
-</script>
+            bounds.getSize(size);
+            bounds.getCenter(center);
+
+            const maxSize = Math.max(
+              size.x,
+              size.y,
+              size.z
+            );
+
+            if (
+              maxSize > 0 &&
+              Number.isFinite(maxSize)
+            ) {
+
+              // Fit the model to the marker
+              const factor = 0.85 / maxSize;
+
+              mesh.scale.setScalar(factor);
+
+              // Centre horizontally and lift base
+              mesh.position.set(
+                -center.x * factor,
+                -bounds.min.y * factor,
+                -center.z * factor
+              );
+            }
+          }
+
+        } catch (error) {
+          console.warn(
+            "Automatic fitting failed:",
+            error
+          );
+        }
+
+        updateStatus();
+      });
+
+      // Model loading error
+      model.addEventListener("model-error", event => {
+
+        modelLoading = false;
+
+        modelError =
+          "assembly.glb could not be loaded.";
+
+        console.error(
+          "GLB loading error:",
+          event.detail
+        );
+
+        updateStatus();
+      });
+
+      // Report browser errors
+      window.addEventListener("error", event => {
+        console.error("Page error:", event.message);
+      });
+
+      setMode("cube");
+    });
+  </script>
 
 </body>
 </html>
