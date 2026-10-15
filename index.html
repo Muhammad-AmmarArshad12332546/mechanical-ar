@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>Mechanical Assembly | AR Presentation</title>
+
+  <script type="module"
+    src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f5f8;
+      text-align: center;
+      color: #172033;
+    }
+
+    header {
+      background: #10233f;
+      color: white;
+      padding: 20px;
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 65vh;
+      background: #e6eaf0;
+    }
+
+    p {
+      padding: 0 16px;
+    }
+
+    .footer {
+      padding: 18px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h2>Mechanical Engineering</h2>
+    <p>Augmented Reality Assembly Demonstration</p>
+  </header>
+
+  <model-viewer
+    src="assembly.glb"
+    alt="Mechanical engineering assembly"
+    camera-controls
+    auto-rotate
+    shadow-intensity="1"
+    exposure="1"
+    ar
+    ar-modes="scene-viewer webxr"
+    ar-scale="auto">
+  </model-viewer>
+
+  <div class="footer">
+    <h3>Explore the Assembly</h3>
+    <p>Rotate and zoom the 3D model.</p>
+    <p>On a compatible Android device,
+       tap the AR button to view it
+       in your environment.</p>
+  </div>
+
+</body>
+</html>
