@@ -2,20 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
   <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+        content="width=device-width, initial-scale=1">
 
-  <title>Mechanical Engineering | Air Purifier AR</title>
+  <title>Air Purifier Augmented Reality</title>
 
-  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
-  <!-- AR.js -->
   <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script>
-
-  <!-- GLB Animation Support -->
-  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
 
   <style>
     html, body {
@@ -32,50 +26,35 @@
       box-sizing: border-box;
     }
 
-    /* Allow AR.js to handle video and canvas sizing */
-    a-scene {
-      width: 100%;
-      height: 100%;
-    }
-
     #header {
       position: fixed;
-      top: 12px;
-      left: 5%;
-      width: 90%;
-      max-width: 500px;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      width: auto;
       padding: 10px;
-      background: rgba(9, 27, 49, 0.85);
+      background: rgba(10, 25, 45, 0.8);
       color: white;
-      border-radius: 10px;
+      border-radius: 8px;
       text-align: center;
-      z-index: 10000;
+      font-size: 14px;
+      z-index: 9999;
       pointer-events: none;
-    }
-
-    #header h3 {
-      margin: 0 0 5px;
-      font-size: 16px;
-    }
-
-    #header p {
-      margin: 0;
-      font-size: 12px;
     }
 
     #status {
       position: fixed;
-      bottom: 20px;
-      left: 5%;
-      width: 90%;
-      max-width: 500px;
-      padding: 12px;
-      background: rgba(0, 0, 0, 0.8);
+      bottom: 15px;
+      left: 10px;
+      right: 10px;
+      width: auto;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.75);
       color: white;
-      border-radius: 10px;
-      font-size: 13px;
+      border-radius: 8px;
       text-align: center;
-      z-index: 10000;
+      font-size: 12px;
+      z-index: 9999;
       pointer-events: none;
     }
   </style>
@@ -83,147 +62,111 @@
 
 <body>
 
-  <!-- Presentation Header -->
   <div id="header">
-    <h3>Mechanical Engineering</h3>
-    <p>SolidWorks 2024 | Air Purifier AR</p>
+    Mechanical Engineering | Air Purifier AR
   </div>
 
-  <!-- Status Message -->
   <div id="status">
-    Initializing AR...
+    Starting AR camera...
   </div>
 
-  <!-- AR Scene -->
   <a-scene
     embedded
     vr-mode-ui="enabled: false"
-    renderer="logarithmicDepthBuffer: true;
-              colorManagement: true;"
-    arjs="sourceType: webcam;
-          debugUIEnabled: false;
-          trackingMethod: best;">
+    arjs="sourceType: webcam; debugUIEnabled: false;">
 
-    <!-- Model Asset -->
-    <a-assets timeout="60000">
-      <a-asset-item
-        id="cadAssembly"
-        src="./assembly.glb">
-      </a-asset-item>
-    </a-assets>
-
-    <!-- Lighting -->
-    <a-entity
-      light="type: ambient;
-             intensity: 1.2;
-             color: #ffffff">
-    </a-entity>
-
-    <a-entity
-      light="type: directional;
-             intensity: 1.3;
-             color: #ffffff"
-      position="2 4 3">
-    </a-entity>
-
-    <!-- HIRO Marker -->
     <a-marker
       id="hiroMarker"
       preset="hiro"
-      emitevents="true"
-      smooth="true"
-      smoothCount="5"
-      smoothTolerance="0.01"
-      smoothThreshold="2">
+      emitevents="true">
 
-      <!-- SolidWorks Air Purifier Assembly -->
       <a-entity
         id="assemblyModel"
-        gltf-model="#cadAssembly"
+        gltf-model="url(./assembly.glb)"
         position="0 0 0"
         rotation="0 0 0"
-        scale="1 1 1"
-        animation-mixer="clip: *;
-                         loop: repeat;
-                         timeScale: 1">
+        scale="1 1 1">
       </a-entity>
 
     </a-marker>
 
-    <!-- AR Camera -->
     <a-entity camera></a-entity>
 
   </a-scene>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener(
+      "DOMContentLoaded",
+      function () {
 
-      const status =
-        document.getElementById("status");
+        const status =
+          document.getElementById("status");
 
-      const marker =
-        document.getElementById("hiroMarker");
+        const marker =
+          document.getElementById("hiroMarker");
 
-      const model =
-        document.getElementById("assemblyModel");
+        const model =
+          document.getElementById("assemblyModel");
 
-      let modelLoaded = false;
-      let markerVisible = false;
-      let loadingError = false;
+        let loaded = false;
+        let detected = false;
+        let error = false;
 
-      function updateStatus() {
-
-        if (loadingError) {
-          status.textContent =
-            "Error loading assembly.glb. Check GitHub files.";
-          return;
+        function update() {
+          if (error) {
+            status.textContent =
+              "Model error: Check assembly.glb";
+          } else if (loaded && detected) {
+            status.textContent =
+              "Model loaded and marker detected";
+          } else if (detected) {
+            status.textContent =
+              "HIRO detected. Loading model...";
+          } else if (loaded) {
+            status.textContent =
+              "Model ready. Scan HIRO marker.";
+          } else {
+            status.textContent =
+              "Starting camera / loading model...";
+          }
         }
 
-        if (modelLoaded && markerVisible) {
-          status.textContent =
-            "Air Purifier ready in Augmented Reality";
-        }
+        model.addEventListener(
+          "model-loaded",
+          function () {
+            loaded = true;
+            update();
+          }
+        );
 
-        else if (modelLoaded) {
-          status.textContent =
-            "Model loaded. Point camera at HIRO marker.";
-        }
+        model.addEventListener(
+          "model-error",
+          function (e) {
+            error = true;
+            console.error(e.detail);
+            update();
+          }
+        );
 
-        else if (markerVisible) {
-          status.textContent =
-            "HIRO marker detected. Loading assembly...";
-        }
+        marker.addEventListener(
+          "markerFound",
+          function () {
+            detected = true;
+            update();
+          }
+        );
 
-        else {
-          status.textContent =
-            "Loading model. Point camera at HIRO marker.";
-        }
+        marker.addEventListener(
+          "markerLost",
+          function () {
+            detected = false;
+            update();
+          }
+        );
+
+        update();
       }
-
-      model.addEventListener("model-loaded", function () {
-        modelLoaded = true;
-        console.log("GLB model loaded successfully");
-        updateStatus();
-      });
-
-      model.addEventListener("model-error", function (event) {
-        loadingError = true;
-        console.error("GLB loading failed:", event.detail);
-        updateStatus();
-      });
-
-      marker.addEventListener("markerFound", function () {
-        markerVisible = true;
-        updateStatus();
-      });
-
-      marker.addEventListener("markerLost", function () {
-        markerVisible = false;
-        updateStatus();
-      });
-
-      updateStatus();
-    });
+    );
   </script>
 
 </body>
