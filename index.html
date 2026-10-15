@@ -1,30 +1,21 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
 
   <meta name="viewport"
-        content="width=device-width,
-                 initial-scale=1.0,
-                 maximum-scale=1.0">
+        content="width=device-width, initial-scale=1.0">
 
   <title>Mechanical Engineering | Air Purifier AR</title>
 
   <!-- A-Frame -->
-  <script
-    src="https://aframe.io/releases/1.6.0/aframe.min.js">
-  </script>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
   <!-- AR.js -->
-  <script
-    src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js">
-  </script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script>
 
   <!-- GLB Animation Support -->
-  <script
-    src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.2.0/dist/aframe-extras.min.js">
-  </script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
 
   <style>
     html, body {
@@ -33,7 +24,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: black;
+      background: #000;
       font-family: Arial, sans-serif;
     }
 
@@ -41,30 +32,10 @@
       box-sizing: border-box;
     }
 
+    /* Allow AR.js to handle video and canvas sizing */
     a-scene {
-      position: fixed !important;
-      top: 0;
-      left: 0;
-      width: 100vw !important;
-      height: 100dvh !important;
-      overflow: hidden;
-    }
-
-    /* AR.js camera sizing */
-    video {
-      position: fixed !important;
-      top: 50% !important;
-      left: 50% !important;
-      transform: translate(-50%, -50%) !important;
-      width: 100vw !important;
-      height: 100dvh !important;
-      object-fit: contain !important;
-    }
-
-    /* WebGL rendering canvas */
-    canvas.a-canvas {
-      width: 100vw !important;
-      height: 100dvh !important;
+      width: 100%;
+      height: 100%;
     }
 
     #header {
@@ -72,12 +43,13 @@
       top: 12px;
       left: 5%;
       width: 90%;
-      padding: 12px;
-      z-index: 10000;
+      max-width: 500px;
+      padding: 10px;
+      background: rgba(9, 27, 49, 0.85);
       color: white;
-      text-align: center;
-      background: rgba(9, 27, 49, 0.86);
       border-radius: 10px;
+      text-align: center;
+      z-index: 10000;
       pointer-events: none;
     }
 
@@ -96,13 +68,14 @@
       bottom: 20px;
       left: 5%;
       width: 90%;
+      max-width: 500px;
       padding: 12px;
-      z-index: 10000;
-      color: white;
       background: rgba(0, 0, 0, 0.8);
+      color: white;
       border-radius: 10px;
-      text-align: center;
       font-size: 13px;
+      text-align: center;
+      z-index: 10000;
       pointer-events: none;
     }
   </style>
@@ -110,28 +83,26 @@
 
 <body>
 
+  <!-- Presentation Header -->
   <div id="header">
     <h3>Mechanical Engineering</h3>
-    <p>Air Purifier | Augmented Reality</p>
+    <p>SolidWorks 2024 | Air Purifier AR</p>
   </div>
 
+  <!-- Status Message -->
   <div id="status">
-    Initializing camera and loading assembly...
+    Initializing AR...
   </div>
 
+  <!-- AR Scene -->
   <a-scene
     embedded
     vr-mode-ui="enabled: false"
     renderer="logarithmicDepthBuffer: true;
-              colorManagement: true;
-              antialias: true;"
+              colorManagement: true;"
     arjs="sourceType: webcam;
           debugUIEnabled: false;
-          trackingMethod: best;
-          sourceWidth: 640;
-          sourceHeight: 480;
-          displayWidth: 640;
-          displayHeight: 480;">
+          trackingMethod: best;">
 
     <!-- Model Asset -->
     <a-assets timeout="60000">
@@ -155,7 +126,7 @@
       position="2 4 3">
     </a-entity>
 
-    <!-- Marker -->
+    <!-- HIRO Marker -->
     <a-marker
       id="hiroMarker"
       preset="hiro"
@@ -165,7 +136,7 @@
       smoothTolerance="0.01"
       smoothThreshold="2">
 
-      <!-- Your SolidWorks Air Purifier -->
+      <!-- SolidWorks Air Purifier Assembly -->
       <a-entity
         id="assemblyModel"
         gltf-model="#cadAssembly"
@@ -179,6 +150,7 @@
 
     </a-marker>
 
+    <!-- AR Camera -->
     <a-entity camera></a-entity>
 
   </a-scene>
@@ -209,7 +181,7 @@
 
         if (modelLoaded && markerVisible) {
           status.textContent =
-            "Air Purifier visible in Augmented Reality";
+            "Air Purifier ready in Augmented Reality";
         }
 
         else if (modelLoaded) {
@@ -224,19 +196,19 @@
 
         else {
           status.textContent =
-            "Loading assembly. Point camera at HIRO marker.";
+            "Loading model. Point camera at HIRO marker.";
         }
       }
 
       model.addEventListener("model-loaded", function () {
         modelLoaded = true;
-        console.log("GLB model loaded");
+        console.log("GLB model loaded successfully");
         updateStatus();
       });
 
       model.addEventListener("model-error", function (event) {
         loadingError = true;
-        console.error("Model loading failed:", event.detail);
+        console.error("GLB loading failed:", event.detail);
         updateStatus();
       });
 
