@@ -4,72 +4,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport"
-        content="width=device-width, initial-scale=1">
+        content="width=device-width, initial-scale=1.0">
 
-  <title>Mechanical Assembly | AR Presentation</title>
+  <title>SolidWorks AR Test</title>
 
-  <script type="module"
-    src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
-  </script>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+  <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script>
 
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f5f8;
-      text-align: center;
-      color: #172033;
-    }
-
-    header {
-      background: #10233f;
-      color: white;
-      padding: 20px;
-    }
-
-    model-viewer {
-      width: 100%;
-      height: 65vh;
-      background: #e6eaf0;
-    }
-
-    p {
-      padding: 0 16px;
-    }
-
-    .footer {
-      padding: 18px;
-      font-size: 14px;
+      overflow: hidden;
     }
   </style>
 </head>
 
 <body>
 
-  <header>
-    <h2>Mechanical Engineering</h2>
-    <p>Augmented Reality Assembly Demonstration</p>
-  </header>
+  <a-scene
+    embedded
+    vr-mode-ui="enabled: false"
+    arjs="sourceType: webcam; debugUIEnabled: false;">
 
-  <model-viewer
-    src="assembly.glb"
-    alt="Mechanical engineering assembly"
-    camera-controls
-    auto-rotate
-    shadow-intensity="1"
-    exposure="1"
-    ar
-    ar-modes="scene-viewer webxr"
-    ar-scale="auto">
-  </model-viewer>
+    <a-marker preset="hiro">
 
-  <div class="footer">
-    <h3>Explore the Assembly</h3>
-    <p>Rotate and zoom the 3D model.</p>
-    <p>On a compatible Android device,
-       tap the AR button to view it
-       in your environment.</p>
-  </div>
+      <a-box
+        position="0 0.5 0"
+        scale="0.5 0.5 0.5"
+        color="red">
+      </a-box>
+
+    </a-marker>
+
+    <a-entity camera></a-entity>
+
+  </a-scene>
 
 </body>
 </html>
+
